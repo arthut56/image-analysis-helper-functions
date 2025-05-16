@@ -3,10 +3,6 @@ from skimage.filters import *
 from skimage.util import img_as_float, img_as_ubyte
 
 
-##Applies threshold automatically
-def otsu_method(img):
-    otsu = threshold_otsu(img)
-    return img > otsu
 
 
 """
@@ -67,6 +63,10 @@ def minimum_distance_threshold_from_images(img1, img2):
 def minimum_distance_threshold_from_arrays(arr1, arr2):
     return (np.mean(arr1) + np.mean(arr2))/2
 
+##Applies threshold automatically
+def otsu_method(img):
+    otsu = threshold_otsu(img)
+    return img > otsu
 
 
 def threshold_image(im_org, channel):

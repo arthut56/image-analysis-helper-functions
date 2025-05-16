@@ -136,3 +136,11 @@ def LDA(X, y):
     return W
 
 
+def predict_LDA(W, X):
+    # Add bias term
+    #Examine here
+    X_aug = np.hstack((np.ones((X.shape[0], 1)), X))
+    # Compute linear discriminant scores
+    scores = X_aug @ W.T
+    # Predict class with highest score
+    return np.argmax(scores, axis=1)
