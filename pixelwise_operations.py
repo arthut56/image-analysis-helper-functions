@@ -52,6 +52,8 @@ spleen_values = img[spleen_mask]
 """
 
 #Measures similarity between 2 binary images
+#Images need to be binary
+#Usually the gt will need to be binarized with > 0
 def dice_score(img1, ground_truth):
     dice = 1 - distance.dice(img1.ravel(), ground_truth.ravel())
     return dice
@@ -138,7 +140,7 @@ def LDA(X, y):
 
 def predict_LDA(W, X):
     # Add bias term
-    #Examine here
+    # Adds 1, 1 for multiplying c w0
     X_aug = np.hstack((np.ones((X.shape[0], 1)), X))
     # Compute linear discriminant scores
     scores = X_aug @ W.T

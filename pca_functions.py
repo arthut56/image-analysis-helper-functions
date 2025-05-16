@@ -77,6 +77,9 @@ To project a single image,
 im1 = read_image_from_path(...).flatten().reshape(1,-1)
 pca.transform(im1)
 
+To get euclidean distances between vectors, do
+np.linalg.norm (v2 - v1) #careful with axis
+
 """
 
 
@@ -104,9 +107,9 @@ def make_data_matrix(path, file_termination="*.png"):
     return data_matrix, all_images
 
 
-
-def make_mean_image(data_matrix):
-    return np.mean(data_matrix, axis=0)
+#When rows are entries
+def make_mean_image(data_matrix, axis=0):
+    return np.mean(data_matrix, axis=axis)
 
 
 #Image is flattened in situ

@@ -33,8 +33,8 @@ def read_dcom_from_path(path):
     #to get pixel values do .pixelarray
     return dicom.dcmread(path).pixel_array
 
-def read_txt(path):
-    return np.loadtxt(path, comments="%")
+def read_txt(path, delimiter=None):
+    return np.loadtxt(path, comments="%", delimiter=delimiter)
 
 
 def get_dimensions(image):
@@ -272,26 +272,39 @@ r = x cos theta + y sin theta
 x1,x2 = sp.symbols('x,y')
 fun = 2*x1 -3*x2 + x1*x2
 
-def gradient_descent_f_2024(x_1_start, x_2_start, func, step_length, n_steps):
+
+def gradient_descent(x_1_start, x_2_start, func, step_length, n_steps):
     grad_x_1 = sp.diff(func, x1)
     grad_x_2 = sp.diff(func, x2)
     x_1 = x_1_start
     x_2 = x_2_start
+    #errors array
     cs = []
-    for i in range(n_steps):
+    xarr = [x_1]
+    yarr = [x_2]
+    xvect = np.array([x_1, x_2])
+    gradvect = np.array([ grad_x_1 ,grad_x_2  ])
+    for i in range(n_steps - 1):
+        xvect = xvect - step_length * np.array([gradvect[0].subs(x1, xvect[0]).subs(x2, xvect[1]),
+                                              gradvect[1].subs(x1, xvect[0]).subs(x2, xvect[1]) ])
+        c = fun.subs(x1, xvect[0]).subs(x2, xvect[1]).evalf()
+        xarr.append(xvect[0])
+        yarr.append(xvect[1])
 
 
-        new_x_1 = x_1 - step_length * grad_x_1.subs(x1, x_1).subs(x2, x_2)
-        new_x_2 = x_2 - step_length * grad_x_2.subs(x2, x_2).subs(x1 , x_1)
-        x_1 = new_x_1
-        x_2 = new_x_2
-        #if i == 4: value at interaction
-        #    print(f"Step {i+1}: x1 {x_1:.2f} x2 {x_2:.2f}")
-        c = func.subs(x1, x_1).subs(x2, x_2).evalf()
-        if c < 0.20:
-            print(f"Step {i+1}: x1 {x_1:.2f} x2 {x_2:.2f} c {c:.2f}")
-            #break
-        cs.append(c)
+        #NUMBER OF ITERATIONS IS I + 1
+        #if c < 2.0:
+        #    print(i)
+        #    break
+
+        xarr.append(x_1)
+        yarr.append(x_2)
+
+
+    #plots green circles with line -
+    plt.plot(xarr, yarr, "go-")
+    plt.show()
+
     plt.plot(cs)
     plt.show()
 
