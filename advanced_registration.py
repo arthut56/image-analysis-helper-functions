@@ -225,7 +225,8 @@ rot_matrix = rotation_matrix(pitch_radians, 0, 0)[:3, :3] # SimpleITK inputs the
 transform.SetCenter(centre_world) # Set the rotation centre
 transform.SetMatrix(rot_matrix.T.flatten())
 transform.SetTranslation((x, y, z))
-
+Python tip: When you manually should set the translation, you should use a list and
+not a numpy array.
 
 # Apply the transformation to the image
 ImgT1_A = sitk.Resample(vol_sitk, transform)
@@ -263,6 +264,7 @@ fixed_image = sitk.ReadImage(dir_in + 'ImgT1.nii')
 moving_image = sitk.ReadImage(dir_in + 'ImgT1_A.nii')
 
 
+R = sitk.ImageRegistrationMethod()
 # Set the optimizer
 R.SetOptimizerAsPowell(stepLength=0.1, numberOfIterations=25)
 
@@ -277,17 +279,36 @@ R.SmoothingSigmasAreSpecifiedInPhysicalUnitsOn()
 
 # Set the initial transform
 R.SetInterpolator(sitk.sitkLinear)
-
+R.SetMetricAsMeanSquares()
 
 #####Change depending on what you have
 # Set the initial transform 
+
+#Initialize the transformation type to rigid 
 initTransform = sitk.Euler3DTransform()
+
+#rotation center to the center of the image
+initTransform = sitk.CenteredTransformInitializer(fixed_image, moving_image, sitk.Euler3DTransform(), sitk.CenteredTransformInitializerFilter.GEOMETRY)
+
 R.SetInitialTransform(initTransform, inPlace=False)
 
 tform_reg = R.Execute(fixed_image, moving_image)
-ImgT1_B = sitk.Resample(moving_image, tform_reg)
 
+
+#To get the new image, you resample it using the received transformation
+ImgT1_B = sitk.Resample(moving_image, tform_reg)
 imshow_orthogonal_view(ImgT1_B, title='T1_B.nii')
+#you can compare the fixed to the moving image (adjusted)
+ overlay_slices(fixedImage, ImgT1_B, title='Overlay')
+To get parameters:
+
+    params = tform_reg.GetParameters()
+    angles = params[:3]
+    trans = params[3:6]
+    print('Estimated translation: ')
+    print(np.round(trans, 3))
+    print('Estimated rotation (deg): ')
+    print(np.round(np.rad2deg(angles), 3))
 
 """
 
