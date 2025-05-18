@@ -27,11 +27,17 @@ import sympy as sp
 
 
 def read_image_from_path(path):
-    return io.imread(path)
+    image = io.imread(path)
+    print("Image dimensions: " + image.shape)
+    print("With pixel ranges: " + np.min(image) + ", " + np.max(image))
+    return image
 
 def read_dcom_from_path(path):
     #to get pixel values do .pixelarray
-    return dicom.dcmread(path).pixel_array
+    image = dicom.dcmread(path).pixel_array
+    print("Image dimensions: " + image.shape)
+    print("With pixel ranges: " + np.min(image) + ", " + np.max(image))
+    return image
 
 def read_txt(path, delimiter=None):
     return np.loadtxt(path, comments="%", delimiter=delimiter)
@@ -297,8 +303,8 @@ def gradient_descent(x_1_start, x_2_start, func, step_length, n_steps):
         #    print(i)
         #    break
 
-        xarr.append(x_1)
-        yarr.append(x_2)
+        x_1 = xvect[0]
+        x_2 = xvect[1]
 
 
     #plots green circles with line -

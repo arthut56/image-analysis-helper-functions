@@ -8,6 +8,8 @@ from skimage.util import img_as_float, img_as_ubyte
 """
 To threshold an image, you apply it an array of boolean values (a mask).
 
+WHEN MASKING USING GT, IT IS USUALLY A GOOD IDEA TO DO gt > 0
+
 
 #All pixel values > 50 become 1, otherwise 0
 image_t = image[image > 50]

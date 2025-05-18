@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
-from IPython.display import clear_output
+#from IPython.display import clear_output
 from skimage.util import img_as_ubyte
 
-def imshow_orthogonal_view(sitkImage, origin=None, title=None):
+
+#Shows the 3 views cross-section
+def imshow_orthogonal_view(sitkImage, origin = None, title=None):
     """
     Display the orthogonal views of a 3D volume from the middle of the volume.
 
@@ -29,7 +31,7 @@ def imshow_orthogonal_view(sitkImage, origin=None, title=None):
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 4))
 
-    data = img_as_ubyte(data / np.max(data))
+    data = img_as_ubyte(data/np.max(data))
     axes[0].imshow(data[origin[0], ::-1, ::-1], cmap='gray')
     axes[0].set_title('Axial')
 
@@ -44,8 +46,8 @@ def imshow_orthogonal_view(sitkImage, origin=None, title=None):
     if title is not None:
         fig.suptitle(title, fontsize=16)
 
-
-def overlay_slices(sitkImage0, sitkImage1, origin=None, title=None):
+#Places 2 slices on top of each other
+def overlay_slices(sitkImage0, sitkImage1, origin = None, title=None):
     """
     Overlay the orthogonal views of a two 3D volume from the middle of the volume.
     The two volumes must have the same shape. The first volume is displayed in red,
@@ -72,15 +74,15 @@ def overlay_slices(sitkImage0, sitkImage1, origin=None, title=None):
 
     if vol0.shape != vol1.shape:
         raise ValueError('The two volumes must have the same shape.')
-    if np.min(vol0) < 0 or np.min(vol1) < 0:  # Remove negative values - Relevant for the noisy images
+    if np.min(vol0) < 0 or np.min(vol1) < 0: # Remove negative values - Relevant for the noisy images
         vol0[vol0 < 0] = 0
         vol1[vol1 < 0] = 0
     if origin is None:
         origin = np.array(vol0.shape) // 2
 
     sh = vol0.shape
-    R = img_as_ubyte(vol0 / np.max(vol0))
-    G = img_as_ubyte(vol1 / np.max(vol1))
+    R = img_as_ubyte(vol0/np.max(vol0))
+    G = img_as_ubyte(vol1/np.max(vol1))
 
     vol_rgb = np.zeros(shape=(sh[0], sh[1], sh[2], 3), dtype=np.uint8)
     vol_rgb[:, :, :, 0] = R
@@ -150,6 +152,11 @@ def composite2affine(composite_transform, result_center=None):
     return sitk.AffineTransform(A.flatten(), t, c)
 
 
+#To read a 3D image, do
+
+vol_sitk = sitk.ReadImage("directory")
+
+
 def rotation_matrix(pitch, roll, yaw, deg=False):
     """
     Return the rotation matrix associated with the Euler angles roll, pitch, yaw.
@@ -186,11 +193,45 @@ def rotation_matrix(pitch, roll, yaw, deg=False):
                     [0, 0, 1, 0],
                     [0, 0, 0, 1]])
 
-    #Change as needed
     R = np.dot(np.dot(R_x, R_y), R_z)
 
     return R
 
+
+"""
+TRANSFORMING
+
+An important consideration it is that ITK transforms store the resampling transform/backward mapping transform 
+(fixed to moving image). And then, internally, it applies the inverse of the transform to the moving image. This means 
+that we have to pass the inverse matrix of the one we have defined. This is because the transformation is applied to 
+the moving image and not to the fixed image. It is  important to consider when we want to apply the transformation 
+to the fixed image.
+
+Note that the inverse or the rotation matrix is the same as the transpose of the rotation matrix, then, 
+when we set the rotation matrix: transform.SetMatrix(rot_matrix.T.flatten())
+
+For a more general transformation matrix (no only rotations involved), you should compute the inverse 
+matrix: transform.SetMatrix(np.linealg.inv(rot_matrix).flatten())
+
+
+e.g.
+
+transform = sitk.AffineTransform(3)
+
+centre_image = np.array(vol_sitk.GetSize()) / 2 - 0.5 # Image Coordinate System
+centre_world = vol_sitk.TransformContinuousIndexToPhysicalPoint(centre_image) # World Coordinate System
+rot_matrix = rotation_matrix(pitch_radians, 0, 0)[:3, :3] # SimpleITK inputs the rotation and the translation separately
+
+transform.SetCenter(centre_world) # Set the rotation centre
+transform.SetMatrix(rot_matrix.T.flatten())
+transform.SetTranslation((x, y, z))
+
+
+# Apply the transformation to the image
+ImgT1_A = sitk.Resample(vol_sitk, transform)
+
+
+"""
 
 def homogeneous_matrix_from_transform(transform):
     """Convert a SimpleITK transform to a homogeneous matrix."""
@@ -199,3 +240,70 @@ def homogeneous_matrix_from_transform(transform):
     matrix[:3, 3] = transform.GetTranslation()
     matrix[3, 3] = 1
     return matrix
+
+#Maybe the angles in the rotation matrix need to be given in negative, somtimes that works
+
+def parameters_from_transform(transform):
+    params = transform.GetParameters()
+    angles = params[:3]
+    print("Angles:")
+    print(angles)
+    trans = params[3:6]
+    print("Translations:")
+    print(trans)
+
+
+
+
+
+"""
+FIXED VS MOVING IMAGES
+
+fixed_image = sitk.ReadImage(dir_in + 'ImgT1.nii')
+moving_image = sitk.ReadImage(dir_in + 'ImgT1_A.nii')
+
+
+# Set the optimizer
+R.SetOptimizerAsPowell(stepLength=0.1, numberOfIterations=25)
+
+# Set the sampling strategy
+R.SetMetricSamplingStrategy(R.RANDOM)
+R.SetMetricSamplingPercentage(0.20)
+
+# Set the pyramid scheule
+R.SetShrinkFactorsPerLevel(shrinkFactors = [2])
+R.SetSmoothingSigmasPerLevel(smoothingSigmas=[0])
+R.SmoothingSigmasAreSpecifiedInPhysicalUnitsOn()
+
+# Set the initial transform
+R.SetInterpolator(sitk.sitkLinear)
+
+
+#####Change depending on what you have
+# Set the initial transform 
+initTransform = sitk.Euler3DTransform()
+R.SetInitialTransform(initTransform, inPlace=False)
+
+tform_reg = R.Execute(fixed_image, moving_image)
+ImgT1_B = sitk.Resample(moving_image, tform_reg)
+
+imshow_orthogonal_view(ImgT1_B, title='T1_B.nii')
+
+"""
+
+
+"""
+COMBINING TRANSFORMS
+
+# Concatenate - The last added transform is applied first
+tform_composite = sitk.CompositeTransform(3)
+
+tform_composite.AddTransform(tform_240.GetNthTransform(0)) 
+tform_composite.AddTransform(tform_180.GetNthTransform(0))
+tform_composite.AddTransform(tform_60.GetNthTransform(0))
+tform_composite.AddTransform(tform_0.GetNthTransform(0))
+# Transform the composite transform to an affine transform
+affine_composite = composite2affine(tform_composite, centre_world)
+
+
+"""

@@ -20,6 +20,15 @@ def histogram_stretch(img_in, min_desired, max_desired):
     # img_as_ubyte will multiply all pixel values with 255.0 before converting to unsigned byte
     return img_as_ubyte(img_out)
 
+"""
+plt.hist(im_s.ravel(), bins=256)
+plt.title('Image histogram')
+io.show()
+
+io.imshow(im_s)
+io.show()
+"""
+
 
 #g(x,y) = f(x,y)^gamma
 def gamma_map(img, gamma):

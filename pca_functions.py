@@ -80,6 +80,24 @@ pca.transform(im1)
 To get euclidean distances between vectors, do
 np.linalg.norm (v2 - v1) #careful with axis
 
+
+When asked to do pairwise comparisons of several images, e.g.:
+
+
+    #maps position in data matrix to flower number
+    mapping = [8, 15, 10, 9, 14, 2, 4, 12, 1, 5, 6, 13, 7, 3, 11]
+
+    pca1 = data_transform[:, 0]
+
+    pairwise = [(1, 12), (10, 12), (2, 5), (8, 9), (3, 7)]
+
+
+    for pair in pairwise:
+        print(pair)
+        print(np.linalg.norm(pca1[mapping.index(pair[0])] - pca1[mapping.index(pair[1])]))
+        print("###")
+
+
 """
 
 
