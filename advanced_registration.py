@@ -307,3 +307,37 @@ affine_composite = composite2affine(tform_composite, centre_world)
 
 
 """
+
+
+"""
+3D <-> ARRAY
+
+sitk.GetImageFromArray(im_as_array.astype(np.uint8))
+                                ^^^^^^^^^^^^^^^ when binary
+                                
+sitk.GetArrayFromImage(im_as_3d)
+
+
+"""
+
+def normalized_correlation(img1, img2):
+    """
+    Calculate the normalized correlation coefficient between two images.
+    Both img1 and img2 should be NumPy arrays of the same shape.
+    """
+    # Flatten the images
+    img1_flat = img1.flatten()
+    img2_flat = img2.flatten()
+
+    # Subtract the mean
+    img1_mean_centered = img1_flat - np.mean(img1_flat)
+    img2_mean_centered = img2_flat - np.mean(img2_flat)
+
+    # Compute the normalized correlation coefficient
+    numerator = np.sum(img1_mean_centered * img2_mean_centered)
+    denominator = np.sqrt(np.sum(img1_mean_centered ** 2) * np.sum(img2_mean_centered ** 2))
+
+    if denominator == 0:
+        return 0  # Avoid division by zero
+
+    return numerator / denominator
