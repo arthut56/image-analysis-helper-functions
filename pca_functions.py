@@ -129,11 +129,14 @@ def make_data_matrix(path, file_termination="*.png"):
 def make_mean_image(data_matrix, axis=0):
     return np.mean(data_matrix, axis=axis)
 
+#Mean squared error
+def mse(arr1, arr2):
+    return np.mean((arr1 - arr2) ** 2)
 
 #Image is flattened in situ
 #Sum of squared differences from one image to all images in dataset
 def ssd(data_matrix, image):
     #outputs a vector
-    return np.linalg.norm(data_matrix - image.flatten(), axis=1)
+    return np.sum(np.square(data_matrix - image.flatten()), axis=1)
 
 

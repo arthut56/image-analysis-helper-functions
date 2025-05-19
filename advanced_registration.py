@@ -218,18 +218,20 @@ e.g.
 
 transform = sitk.AffineTransform(3)
 
+##Might be not necessary in the question#####
 centre_image = np.array(vol_sitk.GetSize()) / 2 - 0.5 # Image Coordinate System
 centre_world = vol_sitk.TransformContinuousIndexToPhysicalPoint(centre_image) # World Coordinate System
-rot_matrix = rotation_matrix(pitch_radians, 0, 0)[:3, :3] # SimpleITK inputs the rotation and the translation separately
-
 transform.SetCenter(centre_world) # Set the rotation centre
+#############################################
+
+rot_matrix = rotation_matrix(pitch_radians, 0, 0)[:3, :3] # SimpleITK inputs the rotation and the translation separately
 transform.SetMatrix(rot_matrix.T.flatten())
 transform.SetTranslation((x, y, z))
-Python tip: When you manually should set the translation, you should use a list and
-not a numpy array.
+#Python tip: When you manually should set the translation, you should use a list and
+#not a numpy array.
 
 # Apply the transformation to the image
-ImgT1_A = sitk.Resample(vol_sitk, transform)
+resampled_im = sitk.Resample(vol_sitk, transform)
 
 
 """
@@ -362,3 +364,7 @@ def normalized_correlation(img1, img2):
         return 0  # Avoid division by zero
 
     return numerator / denominator
+
+#Mean squared error
+def mse(arr1, arr2):
+    return np.mean((arr1 - arr2) ** 2)
