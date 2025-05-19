@@ -328,8 +328,49 @@ tform_composite.AddTransform(tform_0.GetNthTransform(0))
 # Transform the composite transform to an affine transform
 affine_composite = composite2affine(tform_composite, centre_world)
 
+##########
+e.g.:
+1. 30 deg roll
+2. 10 x translation
+3. 10 deg yaw
 
+
+transform = sitk.CompositeTransform(3)
+
+transform1 = sitk.AffineTransform(3)
+transform2 = sitk.AffineTransform(3)
+transform3 = sitk.AffineTransform(3)
+
+transform1.SetMatrix(rotation_matrix(0, -30, 0, deg=True)[:3,:3].T.flatten())
+transform2.SetTranslation([10,0,0])
+transform3.SetMatrix(rotation_matrix(0, 0, -10, deg=True)[:3,:3].T.flatten())
+
+transform.AddTransform(transform3)
+transform.AddTransform(transform2)
+transform.AddTransform(transform1)
+
+transform = composite2affine(transform)
+print(homogeneous_matrix_from_transform(transform))
+######
+
+Or alternative:
+
+R1 = rotation_matrix(0, -30, 0, deg=True)
+T = np.array([[1, 0, 0, 10],
+              [0, 1, 0, 0],
+              [0, 0, 1, 0],
+              [0, 0, 0, 1]])
+R3 = rotation_matrix(0, 0, -10, deg=True)
+
+
+First goes to the right
+print(R3 @ T @ R1)
 """
+
+
+
+
+
 
 
 """

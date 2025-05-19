@@ -270,6 +270,12 @@ pca distances = np.linalg.norm(result, axis=1)
 r = x cos theta + y sin theta
 
 *theta needs to be in radians (np.deg2rad)
+
+
+When measuring from x,y coordinate system:
+
+Get the length of the line, ro.
+Get the angle with respect to the perpendicular line originating from the origin.
 """
 
 ############################################################
