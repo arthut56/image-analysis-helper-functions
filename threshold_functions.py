@@ -49,6 +49,8 @@ def median_filtering(image, kernel_size):
     footprint = np.ones([kernel_size, kernel_size])
     return median(image, footprint)
 
+
+#Image needs to be grayscale
 #Correlation is automatic
 def gaussian_filter(image, sigma):
     return gaussian(image, sigma)
