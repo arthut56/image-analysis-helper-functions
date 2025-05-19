@@ -28,15 +28,15 @@ import sympy as sp
 
 def read_image_from_path(path):
     image = io.imread(path)
-    print("Image dimensions: " + image.shape)
-    print("With pixel ranges: " + np.min(image) + ", " + np.max(image))
+    print("Image dimensions: " + str(image.shape))
+    print("With pixel ranges: " + str(np.min(image)) + ", " + str(np.max(image)))
     return image
 
 def read_dcom_from_path(path):
     #to get pixel values do .pixelarray
     image = dicom.dcmread(path).pixel_array
-    print("Image dimensions: " + image.shape)
-    print("With pixel ranges: " + np.min(image) + ", " + np.max(image))
+    print("Image dimensions: " + str(image.shape))
+    print("With pixel ranges: " + str(np.min(image))) + ", " + str(np.max(image))
     return image
 
 def read_txt(path, delimiter=None):
@@ -318,6 +318,8 @@ def gradient_descent(x_1_start, x_2_start, func, step_length, n_steps):
         x_1 = xvect[0]
         x_2 = xvect[1]
 
+        cs.append(float(c))
+
 
     #plots green circles with line -
     plt.plot(xarr, yarr, "go-")
@@ -326,6 +328,56 @@ def gradient_descent(x_1_start, x_2_start, func, step_length, n_steps):
     plt.plot(cs)
     plt.show()
 
+#############################################
+#Gradient descent (with countour)
+"""
+def gradient_descent_f_2024(x_1_start, x_2_start, func, step_length, n_steps, var_x1, var_x2):
+    grad_x_1 = sp.diff(func, var_x1)
+    grad_x_2 = sp.diff(func, var_x2)
+
+    x_1 = x_1_start
+    x_2 = x_2_start
+    cs = []
+    path = [(x_1, x_2)]
+
+    for i in range(n_steps):
+        grad1_val = grad_x_1.subs({var_x1: x_1, var_x2: x_2}).evalf()
+        grad2_val = grad_x_2.subs({var_x1: x_1, var_x2: x_2}).evalf()
+        x_1 = float(x_1 - step_length * grad1_val)
+        x_2 = float(x_2 - step_length * grad2_val)
+
+        path.append((x_1, x_2))
+
+        c = func.subs({var_x1: x_1, var_x2: x_2}).evalf()
+        if c < 2:
+            print(i+1)
+        cs.append(float(c))
+
+    # Convert path to NumPy array
+    path = np.array(path)
+
+    # Plot contour of function
+    x_range = np.linspace(-6, 6, 100)
+    y_range = np.linspace(-6, 6, 100)
+    X, Y = np.meshgrid(x_range, y_range)
+    Z_func = sp.lambdify((var_x1, var_x2), func, 'numpy')
+    Z = Z_func(X, Y)
+
+    plt.figure(figsize=(8, 6))
+    cp = plt.contour(X, Y, Z, levels=30, cmap='viridis')
+    plt.clabel(cp, inline=True, fontsize=8)
+
+    # Plot path
+    plt.plot(path[:, 0], path[:, 1], 'ro--', label='Gradient Descent Path')
+    plt.scatter(path[0, 0], path[0, 1], color='blue', label='Start')
+    plt.scatter(path[-1, 0], path[-1, 1], color='green', label='End')
+    plt.xlabel('x1')
+    plt.ylabel('x2')
+    plt.title('Gradient Descent Path on Function Contour')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+"""
 
 #########################################################
 #3D image registration

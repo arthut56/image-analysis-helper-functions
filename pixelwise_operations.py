@@ -53,6 +53,14 @@ Parametric pixel classification
 - Make normal dist for each image to which the pixel can belong to
 - do norm.pdf(pixel) and select the image with that gives the highest prob
 
+
+for i in range(255):
+    w = norm.pdf(i, mu1, sigma1)
+    b = norm.pdf(i,mu2,sigma2)
+    if b < w:   #Change to your exercise topic
+        print(i)
+        
+        
 Segmentation:
 fat_img = (img > t_background) & (img <= t_fat_soft)
 
