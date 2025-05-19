@@ -226,6 +226,12 @@ f = error_x + error_y
 print(f"Landmark alignment error F: {f}")
 
 
+Find optimal translation (simple method):
+
+Find the average pixel in src, dst.
+Do av_dst - av_src to find the vector that maps src to dst
+
+
 Find optimal transformation:
 
 tform = EuclideanTransform()/SimilarityTransform()
