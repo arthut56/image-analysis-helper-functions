@@ -49,7 +49,7 @@ def minimum_distance_threshold(img1, img2):
     return (np.mean(img1) + np.mean(img2))/2
 
 """
-Parametric pixel classification
+Parametric pixel classification (gaussian)
 - Make normal dist for each image to which the pixel can belong to
 - do norm.pdf(pixel) and select the image with that gives the highest prob
 
@@ -60,6 +60,11 @@ for i in range(255):
     if b < w:   #Change to your exercise topic
         print(i)
         
+      
+With bayesian classification:
+
+multiply the probability (pdf) by the % of tissue present in the image
+      
         
 Segmentation:
 fat_img = (img > t_background) & (img <= t_fat_soft)

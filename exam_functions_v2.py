@@ -146,6 +146,9 @@ pca.transform(im1)
 """
 1/g + 1/b = 1/f
 
+b/B = g/G
+
+
 FOV hori = 2* arctan (sensor width/2f)
 FOV vert = 2* arctan (sensor height/2f)
 
@@ -181,7 +184,7 @@ resulting_image = rotate(img, 16, center=(20,20))
                                ^ degrees
                                
                                
-- Euclidean Transform (Translation + Rotation):
+- Euclidean Transform (Translation + Rotation, rigid body):
 
 rotation_angle = 10.0 * math.pi / 180.
 translation_vector = [10, 20]
@@ -576,7 +579,14 @@ def show_comparison(original, modified, modified_name):
 
 
 
+"""
+Entropy
 
+entropy = -pAlog2(pA) - pBlog2(pB)
+
+H(X,Y) <= H(X) + H(Y)
+
+"""
 
 
 

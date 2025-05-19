@@ -70,3 +70,21 @@ def measure_blob_circularity(area, perim):
     est_perim = 2*math.sqrt(math.pi * area)
     return perim / est_perim
 
+
+"""
+Confusion matrix
+
+accuracy = (TP + TN) / N
+
+N = TN + TP + FN + FP
+
+sensitivity = TP / (TP + FN)
+
+specificity = TN / (TN + FP)
+
+FPR = FP / (FP + TN)
+
+TPR = TP / (TP + FN)
+
+
+"""
